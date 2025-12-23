@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Live Cameras{% endblock %}
+
+{% block content %}
+
+<main class="main-content">
+
+    <div class="container">
+        <div class="breadcrumb">
+            <span>Live Cameras</span>
+        </div>
+    </div>
+
+    <div class="fullwidth-block">
+        <div class="container">
+
+            <!-- ================= FILTER FORM ================= -->
+            <form method="get" class="filter d-flex flex-wrap mb-3" style="gap:1rem;">
+
+                <!-- Country Filter -->
+                <div class="country filter-control">
+                    <label for="country">Country</label>
+                    <span class="select control">
+                        <select name="country" id="country" class="form-select">
+                            <option value="">All Countries</option>
+                            {% for c in countries %}
+                                <option value="{{ c }}" {% if c == selected_country %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </span>
+                </div>
+
+                <!-- Per Page -->
+                <div class="count filter-control">
+                    <label for="per_page">Show per page</label>
+                    <span class="select control">
+                        <select name="per_page" id="per_page" class="form-select">
+                            <option value="4"  {% if per_page == 4 %}selected{% endif %}>4</option>
+                            <option value="8"  {% if per_page == 8 %}selected{% endif %}>8</option>
+                            <option value="12" {% if per_page == 12 %}selected{% endif %}>12</option>
+                            <option value="16" {% if per_page == 16 %}selected{% endif %}>16</option>
+                            <option value="20" {% if per_page == 20 %}selected{% endif %}>20</option>
+                        </select>
+                    </span>
+                </div>
+
+                <!-- Quality -->
+                <div class="quality filter-control">
+                    <label for="quality">Only high quality</label>
+                    <span class="select control">
+                        <select name="quality" id="quality" class="form-select">
+                            <option value="">Any</option>
+                            <option value="yes" {% if selected_quality == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no"  {% if selected_quality == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </span>
+                </div>
+
+                <div class="align-self-end">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <a href="{% url request.resolver_match.url_name %}" class="btn btn-link">Reset</a>
+                </div>
+
+            </form>
+            <!-- ================= END FILTER FORM ================= -->
+
+
+
+            <!-- ================= CAMERAS GRID ================= -->
+            <div class="row">
+
+                {% if cameras_page.object_list %}
+                    {% for cam in cameras_page.object_list %}
+                        <div class="col-md-3 col-sm-6 mb-4">
+                            <div class="live-camera card h-100">
+
+                                {% if cam.image %}
+                                    <img src="{{ cam.image.url }}" class="card-img-top" alt="{{ cam.title }}">
+                                {% else %}
+                                    <img src="{% static 'images/live-camera-placeholder.jpg' %}" class="card-img-top" alt="{{ cam.title }}">
+                                {% endif %}
+
+                                <div class="card-body">
+                                    <h5 class="location card-title">{{ cam.title }}</h5>
+                                    <p class="mb-1"><small class="text-muted">{{ cam.country }}</small></p>
+                                    <p><small class="date text-muted">{{ cam.timestamp|date:"j M, g:ia" }}</small></p>
+
+                                    {% if cam.stream_url %}
+                                        <a href="{{ cam.stream_url }}" class="btn btn-sm btn-outline-primary" target="_blank">View Stream</a>
+                                    {% endif %}
+
+                                    {% if cam.is_high_quality %}
+                                        <span class="badge bg-success ms-2">HQ</span>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-12">
+                        <p>No cameras found.</p>
+                    </div>
+                {% endif %}
+
+            </div>
+            <!-- ================= END CAMERAS GRID ================= -->
+
+
+
+            <!-- ================= PAGINATION ================= -->
+            {% if paginator.num_pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+
+                    <!-- Previous -->
+                    {% if cameras_page.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?{% for key,val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val|urlencode }}&{% endif %}{% endfor %}page={{ cameras_page.previous_page_number }}">
+                                &laquo;
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                    {% endif %}
+
+                    <!-- Page Numbers -->
+                    {% for p in paginator.page_range %}
+                        {% if p == cameras_page.number %}
+                            <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                   href="?{% for key,val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val|urlencode }}&{% endif %}{% endfor %}page={{ p }}">
+                                    {{ p }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Next -->
+                    {% if cameras_page.has_next %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?{% for key,val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val|urlencode }}&{% endif %}{% endfor %}page={{ cameras_page.next_page_number }}">
+                                &raquo;
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+            {% endif %}
+            <!-- ================= END PAGINATION ================= -->
+
+        </div>
+    </div>
+
+</main>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+Django==5.2.7
+dnspython==2.8.0
+fastapi==0.119.1
+strawberry-graphql==0.284.1
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+tzdata==2025.2
+virtualenv==20.35.3
+virtualenv-clone==0.5.7
+virtualenvwrapper==6.1.1
