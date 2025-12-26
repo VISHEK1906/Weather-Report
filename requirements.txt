@@ -18,7 +18,6 @@ mysql-connector-python==9.5.0
 packaging==25.0
 pillow==12.0.0
 platformdirs==4.5.0
-psycopg2==2.9.11
 pydantic==2.12.3
 pydantic_core==2.41.4
 pydentic==0.0.1.dev3
